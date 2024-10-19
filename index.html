@@ -1,0 +1,322 @@
+<html>
+<head>
+    <title>Course Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <script>
+        function filterCourses() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const courses = document.querySelectorAll('.course-item');
+            courses.forEach(course => {
+                const courseText = course.textContent.toLowerCase();
+                if (courseText.includes(searchInput)) {
+                    course.style.display = '';
+                } else {
+                    course.style.display = 'none';
+                }
+            });
+        }
+
+        function selectMode(courseId, mode) {
+            const course = document.getElementById(courseId);
+            const onlineButton = course.querySelector('.online-button');
+            const inPersonButton = course.querySelector('.in-person-button');
+
+            if (mode === 'online') {
+                onlineButton.classList.add('bg-green-500', 'text-white');
+                inPersonButton.classList.remove('bg-green-500', 'text-white');
+            } else {
+                inPersonButton.classList.add('bg-green-500', 'text-white');
+                onlineButton.classList.remove('bg-green-500', 'text-white');
+            }
+
+            course.setAttribute('data-mode', mode);
+        }
+
+        function addToList(courseId, credits) {
+            const course = document.getElementById(courseId);
+            const mode = course.getAttribute('data-mode');
+
+            if (!mode) {
+                alert('Please select Online or In Person before adding to the list.');
+                return;
+            }
+
+            const registrationList = document.getElementById('registrationList');
+            const creditBar = document.getElementById('creditBar');
+            const currentCredits = parseInt(creditBar.getAttribute('data-credits'));
+            const newCredits = currentCredits + credits;
+
+            // Clone the course item and add it to the registration list
+            const courseClone = course.cloneNode(true);
+            courseClone.querySelector('.add-to-list').remove();
+            courseClone.querySelector('.online-button').remove();
+            courseClone.querySelector('.in-person-button').remove();
+
+            // Add remove button
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('mt-2', 'bg-red-500', 'text-white', 'rounded-full', 'p-2', 'remove-from-list');
+            removeButton.innerHTML = '<i class="fas fa-times"></i>';
+            removeButton.onclick = function() {
+                removeFromList(courseClone, credits);
+            };
+            courseClone.appendChild(removeButton);
+
+            registrationList.appendChild(courseClone);
+
+            // Update the credit bar
+            creditBar.style.width = `${(newCredits / 18) * 100}%`;
+            creditBar.setAttribute('data-credits', newCredits);
+        }
+
+        function removeFromList(course, credits) {
+            const registrationList = document.getElementById('registrationList');
+            const creditBar = document.getElementById('creditBar');
+            const currentCredits = parseInt(creditBar.getAttribute('data-credits'));
+            const newCredits = currentCredits - credits;
+
+            // Remove the course from the registration list
+            registrationList.removeChild(course);
+
+            // Update the credit bar
+            creditBar.style.width = `${(newCredits / 18) * 100}%`;
+            creditBar.setAttribute('data-credits', newCredits);
+        }
+
+        function toggleDarkMode() {
+            const body = document.body;
+            body.classList.toggle('dark');
+        }
+    </script>
+    <style>
+        .dark {
+            background-color: #1a202c;
+            color: #cbd5e0;
+        }
+        .dark .bg-white {
+            background-color: #2d3748;
+        }
+        .dark .bg-gray-50 {
+            background-color: #1a202c;
+        }
+        .dark .bg-gray-100 {
+            background-color: #2d3748;
+        }
+        .dark .bg-gray-200 {
+            background-color: #4a5568;
+        }
+        .dark .text-gray-500 {
+            color: #a0aec0;
+        }
+        .dark .text-gray-700 {
+            color: #e2e8f0;
+        }
+        .dark .border-gray-300 {
+            border-color: #4a5568;
+        }
+        .dark .bg-green-500 {
+            background-color: #48bb78;
+        }
+        .dark .bg-red-500 {
+            background-color: #f56565;
+        }
+        .dark .bg-blue-500 {
+            background-color: #4299e1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="container mx-auto p-4">
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center">
+                <img alt="UCF Logo" class="mr-2" height="50" src="https://www.ucf.edu/files/2017/11/UCF-Logo.png" width="50" style="--darkreader-inline-outline: #2d438b; --darkreader-inline-bgcolor: #3e4142;" data-darkreader-inline-outline="" data-darkreader-inline-bgcolor="">
+                <h1 class="text-xl font-bold">UCF COURSE REGISTRATION</h1>
+            </div>
+            <div class="flex space-x-4">
+                <a class="text-gray-500" href="#">OVERVIEW</a>
+                <a class="text-red-500 border-b-2 border-red-500" href="#">REGISTER</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-bell text-gray-500"></i>
+                <i class="fas fa-user text-gray-500"></i>
+                <button class="text-gray-500">Log out</button>
+                <button class="text-gray-500" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+            </div>
+        </div>
+        <div class="flex">
+            <div class="w-3/4 pr-4">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold">Browse courses</h2>
+                        <div class="flex space-x-2">
+                            <select class="border border-gray-300 rounded p-2">
+                                <option>Fall 2024</option>
+                                <option>Spring 2024</option>
+                                <option>Summer 2024</option>
+                            </select>
+                            <select class="border border-gray-300 rounded p-2">
+                                <option>Elective type</option>
+                                <option>Lab</option>
+                                <option>Lecture</option>
+                                <option>Seminar</option>
+                            </select>
+                            <select class="border border-gray-300 rounded p-2">
+                                <option>Credit</option>
+                                <option>1 Credit</option>
+                                <option>2 Credits</option>
+                                <option>3 Credits</option>
+                                <option>4 Credits</option>
+                            </select>
+                            <select class="border border-gray-300 rounded p-2">
+                                <option>Time</option>
+                                <option>Morning</option>
+                                <option>Afternoon</option>
+                                <option>Evening</option>
+                            </select>
+                            <select class="border border-gray-300 rounded p-2">
+                                <option>Systems Engineering</option>
+                                <option>Computer Science</option>
+                                <option>Mechanical Engineering</option>
+                                <option>Electrical Engineering</option>
+                            </select>
+                            <button class="border border-gray-300 rounded p-2">
+                                <i class="fas fa-sliders-h"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <input id="searchInput" onkeyup="filterCourses()" class="w-full border border-gray-300 rounded p-2 mb-4" placeholder="Search by course, CRN, department, instructor, or subject" type="text"/>
+                    <div class="mb-4">
+                        <h3 class="text-md font-bold mb-2">REQUIRED COURSES</h3>
+                        <div id="course1" class="course-item bg-gray-100 p-4 rounded-lg mb-4" data-mode="">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-book text-gray-500 mr-2"></i>
+                                    <span class="font-bold">Mandatory</span>
+                                </div>
+                                <button class="text-gray-500">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                            <h4 class="text-lg font-bold">Systems Engineering</h4>
+                            <p class="text-gray-500">CRN: 12345 . 4 credits</p>
+                            <div class="flex space-x-2 mt-2">
+                                <button class="border border-gray-300 rounded p-2 online-button" onclick="selectMode('course1', 'online')">Online</button>
+                                <button class="border border-gray-300 rounded p-2 in-person-button" onclick="selectMode('course1', 'in-person')">In Person</button>
+                                <a href="https://drive.google.com/file/d/19YHqIw-mx7mEvPtHFh1oTtsx6hw9P2aV/view?usp=sharing" class="bg-blue-500 text-white rounded p-2">Syllabus</a>
+                            </div>
+                            <p class="text-gray-500 mt-2">0/30 enrollment . Tue Wed 9:00am - 11:40am . Gulsah Hancerliogullari Koksalmis</p>
+                            <button class="mt-2 bg-gray-200 text-gray-700 rounded p-2 add-to-list" onclick="addToList('course1', 4)">+ Add to list</button>
+                        </div>
+                        <div id="course2" class="course-item bg-gray-100 p-4 rounded-lg mb-4" data-mode="">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-book text-gray-500 mr-2"></i>
+                                    <span class="font-bold">Mandatory</span>
+                                </div>
+                                <button class="text-gray-500">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                            <h4 class="text-lg font-bold">Fluid Mechanics</h4>
+                            <p class="text-gray-500">CRN: 67890 . 3 credits . 0/40 enrollment . Wed 2:00 pm - 3:00 pm . Hamidreza Maghroor</p>
+                            <div class="flex space-x-2 mt-2">
+                                <button class="border border-gray-300 rounded p-2 online-button" onclick="selectMode('course2', 'online')">Online</button>
+                                <button class="border border-gray-300 rounded p-2 in-person-button" onclick="selectMode('course2', 'in-person')">In Person</button>
+                                <a href="https://drive.google.com/file/d/19YHqIw-mx7mEvPtHFh1oTtsx6hw9P2aV/view?usp=sharing" class="bg-blue-500 text-white rounded p-2">Syllabus</a>
+                            </div>
+                            <button class="mt-2 bg-gray-200 text-gray-700 rounded p-2 add-to-list" onclick="addToList('course2', 3)">+ Add to list</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold mb-2">ELECTIVE COURSES</h3>
+                        <div id="course3" class="course-item bg-gray-100 p-4 rounded-lg mb-4" data-mode="">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-cogs text-gray-500 mr-2"></i>
+                                    <span class="font-bold">Elective</span>
+                                </div>
+                                <button class="text-gray-500">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                            <h4 class="text-lg font-bold">Robotics</h4>
+                            <p class="text-gray-500">CRN: 11223 . 3 credits . 0/20 enrollment . Tue 9:00 am - 11:00 am . Dr. Alan Turing</p>
+                            <div class="flex space-x-2 mt-2">
+                                <button class="border border-gray-300 rounded p-2 online-button" onclick="selectMode('course3', 'online')">Online</button>
+                                <button class="border border-gray-300 rounded p-2 in-person-button" onclick="selectMode('course3', 'in-person')">In Person</button>
+                                <a href="https://drive.google.com/file/d/19YHqIw-mx7mEvPtHFh1oTtsx6hw9P2aV/view?usp=sharing" class="bg-blue-500 text-white rounded p-2">Syllabus</a>
+                            </div>
+                            <button class="mt-2 bg-gray-200 text-gray-700 rounded p-2 add-to-list" onclick="addToList('course3', 3)">+ Add to list</button>
+                        </div>
+                        <div id="course4" class="course-item bg-gray-100 p-4 rounded-lg mb-4" data-mode="">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-microchip text-gray-500 mr-2"></i>
+                                    <span class="font-bold">Elective</span>
+                                </div>
+                                <button class="text-gray-500">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                            <h4 class="text-lg font-bold">Microelectronics</h4>
+                            <p class="text-gray-500">CRN: 44556 . 3 credits . 0/25 enrollment . Mon 12:00 pm - 3:00 pm . Dr. Nikola Tesla</p>
+                            <div class="flex space-x-2 mt-2">
+                                <button class="border border-gray-300 rounded p-2 online-button" onclick="selectMode('course4', 'online')">Online</button>
+                                <button class="border border-gray-300 rounded p-2 in-person-button" onclick="selectMode('course4', 'in-person')">In Person</button>
+                                <a href="https://drive.google.com/file/d/19YHqIw-mx7mEvPtHFh1oTtsx6hw9P2aV/view?usp=sharing" class="bg-blue-500 text-white rounded p-2">Syllabus</a>
+                            </div>
+                            <button class="mt-2 bg-gray-200 text-gray-700 rounded p-2 add-to-list" onclick="addToList('course4', 3)">Request permission</button>
+                        </div>
+                        <div id="course5" class="course-item bg-gray-100 p-4 rounded-lg mb-4" data-mode="">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-wrench text-gray-500 mr-2"></i>
+                                    <span class="font-bold">Elective</span>
+                                </div>
+                                <button class="text-gray-500">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                            <h4 class="text-lg font-bold">Mechanical Design</h4>
+                            <p class="text-gray-500">CRN: 77889 . 3 credits . 6/30 enrollment . Tue 9:00 am - 11:00 am . Dr. Henry Ford</p>
+                            <div class="flex space-x-2 mt-2">
+                                <button class="border border-gray-300 rounded p-2 online-button" onclick="selectMode('course5', 'online')">Online</button>
+                                <button class="border border-gray-300 rounded p-2 in-person-button" onclick="selectMode('course5', 'in-person')">In Person</button>
+                                <a href="https://drive.google.com/file/d/19YHqIw-mx7mEvPtHFh1oTtsx6hw9P2aV/view?usp=sharing" class="bg-blue-500 text-white rounded p-2">Syllabus</a>
+                            </div>
+                            <button class="mt-2 bg-gray-200 text-gray-700 rounded p-2 add-to-list" onclick="addToList('course5', 3)">+ Add to list</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-1/4">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-bold mb-4">Registration list</h2>
+                    <p class="text-gray-500 mb-2">Registration open for Fall 2024. Last date to enroll: 19 Jan 2024</p>
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-500">Semester credit limit</span>
+                            <span class="text-gray-500">Fall 2024</span>
+                        </div>
+                        <div class="bg-gray-200 rounded-full h-2 mb-2">
+                            <div id="creditBar" class="bg-green-500 h-2 rounded-full" style="width: 0%;" data-credits="0"></div>
+                        </div>
+                        <div class="flex justify-between text-gray-500 text-sm">
+                            <span>0</span>
+                            <span>Min: 9</span>
+                            <span>Max: 18</span>
+                        </div>
+                    </div>
+                    <div id="registrationList" class="mb-4">
+                        <!-- Registered courses will appear here -->
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <button class="text-gray-500">Clear list</button>
+                        <button class="bg-red-500 text-white rounded p-2">Enroll</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
